@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Calculadora de Stats de Combate</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@1,500&family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@500;600;700&family=DM+Serif+Display&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* 🌙 Moonlight */      --moon1:#5F507B; --moon2:#AD9CBC; --moon3:#EDE4EB;
+    /* 💜 Amethyst Dream */ --ame1:#6B62AE;  --ame2:#9B80A5;  --ame3:#D6A6B9;
+    /* 🌸 Fairy Sunset */   --fai1:#C59FB3;  --fai2:#E0B9A6;  --fai3:#E7D0A8;
+    /* 🫧 Crystal Magic */  --cry1:#EDE4EB;  --cry2:#C9C3DD;  --cry3:#8D9BCB;
+    --ink:#40355A; --soft:#6E5F8A; --card:#FBF7FA; --line:#DCD2E4;
+    --g-moon:linear-gradient(170deg,var(--moon1) 0%,var(--moon2) 42%,var(--moon3) 100%);
+    --g-ame:linear-gradient(100deg,var(--ame1),var(--ame2) 55%,var(--ame3));
+    --g-fai:linear-gradient(100deg,#F1DDE6,#F4E1D7 55%,#F5EAD6);
+    --g-cry:linear-gradient(160deg,var(--cry1),var(--cry2));
+  }
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;color:var(--ink);font-family:"Cormorant Garamond",Georgia,serif;font-size:16px;font-weight:600;line-height:1.4;
+    background:
+      radial-gradient(1.5px 1.5px at 12% 8%,#fff 50%,transparent 51%),
+      radial-gradient(1px 1px at 78% 5%,#fff 50%,transparent 51%),
+      radial-gradient(1.5px 1.5px at 90% 18%,#fff 50%,transparent 51%),
+      radial-gradient(1px 1px at 35% 14%,#fff 50%,transparent 51%),
+      radial-gradient(1px 1px at 58% 3%,#fff 50%,transparent 51%),
+      radial-gradient(1px 1px at 5% 25%,#fff 50%,transparent 51%),
+      var(--g-moon);
+    background-color:var(--moon2)}
+  .wrap{max-width:960px;margin:0 auto;padding:28px 16px 48px}
+  header{background:var(--g-ame);border-radius:22px;padding:26px 16px 22px;text-align:center;margin-bottom:20px;
+    border:1px solid rgba(255,255,255,.55);box-shadow:0 10px 30px rgba(64,53,90,.28),inset 0 1px 0 rgba(255,255,255,.4);color:#fff}
+  header h1{margin:0;font-family:"Cinzel Decorative",serif;font-weight:700;font-size:clamp(19px,4.2vw,30px);letter-spacing:.5px;text-shadow:0 2px 10px rgba(64,53,90,.45)}
+  header p{margin:8px 0 0;font-family:"Bodoni Moda",serif;font-style:italic;font-size:15px;color:#FBEFF4}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:720px){.grid{grid-template-columns:1fr}}
+  .box{background:var(--card);border-radius:18px;overflow:hidden;border:1px solid rgba(255,255,255,.7);box-shadow:0 6px 20px rgba(64,53,90,.18)}
+  .box h2{margin:0;background:var(--g-ame);color:#fff;font-family:"Playfair Display",serif;font-weight:700;font-size:15px;padding:10px 16px;letter-spacing:.4px}
+  .body{padding:12px 14px}
+  .pairs{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px}
+  .field{display:flex;flex-direction:column;gap:3px}
+  .field label,.lbl{font-size:14px;font-weight:700;color:var(--ink);background:var(--g-cry);padding:2px 10px;border-radius:999px}
+  input,select{width:100%;font:inherit;font-size:16px;font-weight:700;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:10px;padding:5px 9px;min-width:0}
+  input:focus,select:focus{outline:2px solid var(--ame1);outline-offset:0}
+  .ro{background:var(--cry1);border:1px solid var(--cry2);border-radius:10px;padding:5px 8px;font-family:"DM Serif Display",serif;font-weight:400;font-size:17px;text-align:center;color:var(--moon1)}
+  table{width:100%;border-collapse:separate;border-spacing:0 6px}
+  th{font-family:"Playfair Display",serif;font-size:12.5px;color:var(--ink);background:var(--cry1);padding:4px 8px;text-align:left}
+  th:first-child{border-radius:8px 0 0 8px} th:last-child{border-radius:0 8px 8px 0}
+  td{padding:0 3px;vertical-align:middle}
+  td.hab{font-size:14px;color:var(--soft);font-style:italic} td.bonus{width:56px}
+  .row{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--g-fai);border:1px solid #EBD3D6;border-radius:12px;padding:6px 9px;margin-top:6px}
+  .row span{font-size:14.5px;font-weight:700;color:var(--ink)}
+  .row select{width:80px;flex:none}
+  .row.sum{background:var(--cry1);border-color:var(--cry2)}
+  .row.sum b{min-width:40px;text-align:center;font-family:"DM Serif Display",serif;font-weight:400;font-size:18px;color:var(--moon1)}
+  .how{background:var(--g-fai);color:var(--ink);font-size:15px;border-radius:18px;padding:14px 18px;border:1px solid rgba(255,255,255,.7);box-shadow:0 6px 20px rgba(64,53,90,.15)}
+  .how strong{font-family:"Playfair Display",serif}
+  .how ol{margin:8px 0 6px;padding-left:20px} .how li{margin:4px 0}
+  .results{margin-top:20px}
+  .results h2{font-family:"Cinzel Decorative",serif;font-size:16px}
+  .res{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:14px}
+  @media (max-width:640px){.res{grid-template-columns:repeat(2,1fr)}}
+  .stat{background:var(--cry1);border:1px solid var(--cry2);border-radius:14px;text-align:center;overflow:hidden}
+  .stat .t{font-family:"Playfair Display",serif;font-weight:600;font-size:13px;padding:6px 4px;color:var(--soft)}
+  .stat .v{background:linear-gradient(160deg,var(--cry2),var(--cry3));color:#fff;font-size:30px;font-family:"DM Serif Display",serif;padding:8px 4px;text-shadow:0 1px 6px rgba(64,53,90,.35)}
+  .stat.deco{background:#F7EAE6;border-color:#EBD3D6}
+  .stat.deco .v{background:var(--g-fai);color:var(--ink);text-shadow:none;font-family:"Bodoni Moda",serif;font-style:italic;font-size:17px;padding:15px 4px}
+  .lyc{margin-top:20px}
+  .note{background:var(--cry1);font-size:14.5px;color:var(--ink);padding:10px 16px;margin:0}
+  details{margin-top:20px}
+  summary{cursor:pointer;background:var(--g-ame);color:#fff;font-family:"Playfair Display",serif;font-weight:700;font-size:15px;padding:10px 16px;border-radius:18px;list-style:none;box-shadow:0 6px 20px rgba(64,53,90,.18)}
+  details[open] summary{border-radius:18px 18px 0 0}
+  .ref{background:var(--card);border-radius:0 0 18px 18px;padding:12px 16px;font-size:15px}
+  .ref h3{font-family:"Playfair Display",serif;font-size:15px;margin:12px 0 6px;color:var(--ame1)}
+  .ref table{border-spacing:0}
+  .ref td,.ref th{padding:6px;border-bottom:1px solid var(--line);vertical-align:top}
+  .ref td{font-size:14.5px}
+  .ref ul{padding-left:18px;margin:6px 0}
+  .tblwrap{overflow-x:auto}
+  button.reset{margin-top:16px;font:inherit;font-family:"Playfair Display",serif;font-weight:600;background:var(--g-fai);color:var(--ink);border:1px solid rgba(255,255,255,.8);border-radius:999px;padding:9px 20px;cursor:pointer;box-shadow:0 4px 14px rgba(64,53,90,.2)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>Calculadora de Stats de Combate</h1>
+  <p>✦ By: Hana Park ✦</p>
+</header>
+
+<div class="grid">
+  <!-- Columna izquierda -->
+  <div style="display:flex;flex-direction:column;gap:16px">
+    <section class="box">
+      <h2>🔮 ATRIBUTOS (Modificadores)</h2>
+      <div class="body pairs">
+        <div class="field"><label for="vigor">Vigor</label><input type="number" id="vigor" value="0"></div>
+        <div class="field"><label for="destreza">Destreza</label><input type="number" id="destreza" value="0"></div>
+        <div class="field"><label for="percepcion">Percepción</label><input type="number" id="percepcion" value="0"></div>
+        <div class="field"><label for="voluntad">Voluntad</label><input type="number" id="voluntad" value="0"></div>
+        <div class="field"><label for="poder">Poder</label><input type="number" id="poder" value="1"></div>
+      </div>
+    </section>
+
+    <section class="box">
+      <h2>🗡️ HABILIDADES CLAVE</h2>
+      <div class="body pairs" id="skills"></div>
+    </section>
+
+    <section class="box">
+      <h2>🧬 RAZA Y OBJETOS QUE MODIFICAN STATS</h2>
+      <div class="body">
+        <div class="field"><label for="raza">Raza</label><select id="raza">
+          <option>Humano</option><option>Metamorfomago</option><option>Semiveela</option><option>Semiduende</option><option>Semigigante</option>
+        </select></div>
+        <div class="row"><span>💍 Anillo de los Carstein (Vigor no suma PAs)</span><select id="carstein"><option>No</option><option>Sí</option></select></div>
+        <div class="row"><span>🛡️ Armadura de Warlock (−2 Iniciativa y Defensa)</span><select id="warlock"><option>No</option><option>Sí</option></select></div>
+      </div>
+    </section>
+
+    <section class="box">
+      <h2>⚗️ POCIONES ACTIVAS (solo esta escena)</h2>
+      <div class="body">
+        <div class="row"><span>💪 Poción de fuerza: culturista +1 / semigigante +2 / gigante +3 Vigor</span><select id="fuerza" style="width:112px">
+          <option value="0">Ninguna</option><option value="1">+1</option><option value="2">+2</option><option value="3">+3</option>
+        </select></div>
+        <div class="row"><span>☕ Poción de actividad (+1 Defensa e Iniciativa)</span><select id="actividad"><option>No</option><option>Sí</option></select></div>
+      </div>
+    </section>
+
+    <div class="how">
+      <strong>📝 Cómo usar esta calculadora:</strong>
+      <ol>
+        <li>Completá tus modificadores de Atributos y Habilidades.</li>
+        <li>Elegí tu Etapa (los PAs base / Umbral base se completan solos).</li>
+        <li>Si tu personaje es Semiduende o Semigigante, o lleva el Anillo de los Carstein o la Armadura de Warlock, marcalo en su recuadro.</li>
+        <li>En los desplegables de arcanos, elegí los objetos, pociones o rituales que tenga canjeados tu personaje y que otorguen Puntos de Pociones o de Rituales extra.</li>
+        <li>Activá los interruptores (Sí/No) de Maletín del Pocionista Inquieto, Herbivicus o Bisutería Arcana si los tenés.</li>
+        <li>Las pociones activas son solo para la escena en la que las tomes: dejalas en "Ninguna"/"No" para ver tu ficha base.</li>
+        <li>¡Los resultados de más abajo se recalculan solos! (Si hice las cosas bien xD) ✨</li>
+      </ol>
+      (Cualquier cosa que esté mal me avisan)
+    </div>
+  </div>
+
+  <!-- Columna derecha -->
+  <div style="display:flex;flex-direction:column;gap:16px">
+    <section class="box">
+      <h2>📌 ETAPA Y STATS BASE</h2>
+      <div class="body pairs">
+        <div class="field" style="grid-column:1/-1"><label for="etapa">Etapa</label><select id="etapa"></select></div>
+        <div class="field"><span class="lbl">PAs base</span><div class="ro" id="pasBase">–</div></div>
+        <div class="field"><span class="lbl">Umbral base</span><div class="ro" id="umbralBase">–</div></div>
+      </div>
+    </section>
+
+    <section class="box">
+      <h2>🧪 PUNTOS DE POCIONES — ARCANOS</h2>
+      <div class="body">
+        <table>
+          <thead><tr><th>Arcano</th><th>Habilidad</th><th>Bonus</th></tr></thead>
+          <tbody id="potArc"></tbody>
+        </table>
+        <div class="row"><span>🧳 Maletín del Pocionista Inquieto (x2, antes de arcanos)</span><select id="maletin"><option>No</option><option>Sí</option></select></div>
+        <div class="row"><span>🌿 Herbivicus activo (ritual)</span><select id="herbivicus"><option>No</option><option>Sí</option></select></div>
+        <div class="row sum"><span>Bonus por arcanos (aditivo)</span><b id="potSum">0</b></div>
+      </div>
+    </section>
+
+    <section class="box">
+      <h2>📜 PUNTOS DE RITUALES — ARCANOS</h2>
+      <div class="body">
+        <table>
+          <thead><tr><th>Arcano</th><th>Habilidad</th><th>Bonus</th></tr></thead>
+          <tbody id="ritArc"></tbody>
+        </table>
+        <div class="row"><span>💍 Bisutería Arcana (x2 al valor de Rituales)</span><select id="bisuteria"><option>No</option><option>Sí</option></select></div>
+        <div class="row sum"><span>Bonus por arcanos (aditivo)</span><b id="ritSum">0</b></div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<section class="box results">
+  <h2 style="text-align:center;font-size:14px">✨ RESULTADOS ✨</h2>
+  <div class="res">
+    <div class="stat"><div class="t">Iniciativa</div><div class="v" id="rIni">0</div></div>
+    <div class="stat"><div class="t">Ataque Físico</div><div class="v" id="rAtF">0</div></div>
+    <div class="stat"><div class="t">Ataque Mágico</div><div class="v" id="rAtM">0</div></div>
+    <div class="stat"><div class="t">Defensa</div><div class="v" id="rDef">0</div></div>
+    <div class="stat"><div class="t">Lucha Física</div><div class="v" id="rLuF">0</div></div>
+    <div class="stat"><div class="t">Lucha Mágica</div><div class="v" id="rLuM">0</div></div>
+    <div class="stat"><div class="t">PAs</div><div class="v" id="rPAs">0</div></div>
+    <div class="stat"><div class="t">Umbral de Heridas</div><div class="v" id="rUmb">0</div></div>
+    <div class="stat"><div class="t">Heridas</div><div class="v" id="rHer">0</div></div>
+    <div class="stat"><div class="t">Puntos de Pociones</div><div class="v" id="rPot">0</div></div>
+    <div class="stat"><div class="t">Puntos de Rituales</div><div class="v" id="rRit">0</div></div>
+    <div class="stat deco"><div class="t">🌸</div><div class="v">Y listo :3</div></div>
+  </div>
+</section>
+
+<section class="box lyc">
+  <h2>🐺 CONDICIONES ESPECIALES</h2>
+  <div class="body">
+    <div class="row"><span>🐺 Licantropía (SOLO PARA PERSONAJES LICÁNTROPOS, CON EL CANJE DE LICANTROPÍA HECHO)</span><select id="licantropia"><option>No</option><option>Sí</option></select></div>
+  </div>
+  <p class="note">Efecto mientras esté en "Sí": +4 Ataque Físico / Iniciativa / Defensa · PAs totales x2 · Umbral de Heridas +4 · Heridas +2.</p>
+</section>
+
+<details>
+  <summary>📖 ARCANOS — lista de referencia</summary>
+  <div class="ref">
+    <h3>🧪 Arcanos de Pociones</h3>
+    <div class="tblwrap"><table id="refPot"></table></div>
+    <h3>📜 Arcanos de Rituales</h3>
+    <div class="tblwrap"><table id="refRit"></table></div>
+    <h3>🔧 Efectos especiales</h3>
+    <ul>
+      <li>🧳 <b>Maletín del Pocionista Inquieto:</b> duplica tus Puntos de Pociones totales (Poder + Pociones) ANTES de sumar los arcanos. Fuente: Objetos — avanzados.</li>
+      <li>🌿 <b>Herbivicus:</b> si está activo, suma tu NIVEL de Herbología a tus Puntos de Pociones. A cambio bloquea 1 Punto de Rituales, pero solo durante la aventura en la que lo declares — no se descuenta de forma permanente en la ficha. Fuente: Rituales — básicos.</li>
+      <li>💍 <b>Bisutería Arcana:</b> duplica el valor de tu habilidad de Rituales dentro de la suma de Puntos de Rituales (Poder + Rituales x2). Fuente: Objetos — intermedios.</li>
+    </ul>
+    <h3>🧬 Raza y objetos que modifican la ficha</h3>
+    <ul>
+      <li>💍 <b>Anillo de los Carstein:</b> reduce a 0 los PAs que se ganan por Vigor (PAs = base + Voluntad). Fuente: Objetos — intermedios.</li>
+      <li>🛡️ <b>Armadura de Warlock:</b> −2 a toda tirada de Iniciativa y Defensa mientras se lleve puesta (reduce el daño recibido, eso no entra en la calculadora). Fuente: Objetos — intermedios.</li>
+      <li>🧝 <b>Semiduende:</b> el Vigor se divide entre dos (redondeando hacia abajo) para calcular PAs y Umbral de Heridas. Fuente: Las Razas.</li>
+      <li>🗿 <b>Semigigante:</b> +2 a las tiradas de Vigor (incluido Ataque Físico) y cada punto de Vigor suma 3 PAs en lugar de 1. Fuente: Las Razas.</li>
+      <li>💪 <b>Pociones de fuerza</b> (culturista +1 / semigigante +2 / gigante +3 Vigor): afectan a Umbral, Ataque Físico, PAs y Lucha Física durante la escena. Fuente: Pociones.</li>
+      <li>☕ <b>Poción de actividad:</b> +1 a Defensa e Iniciativa durante la escena. Fuente: Pociones — básicas.</li>
+      <li>⏳ <b>Poción rejuvenecedora / envejecedora:</b> usan la base de hasta dos etapas menos / más. Para verlo, cambiá la Etapa arriba.</li>
+    </ul>
+  </div>
+</details>
+
+<div style="text-align:center"><button class="reset" id="reset">↺ Reiniciar valores</button></div>
+
+</div>
+
+<script>
+// ===== Tablas (hoja "Arcanos") =====
+const NIVELES = {Desentrenado:0, Novato:1, Competente:2, Experto:4, Maestro:7, Legendario:9}; // nivel de habilidad -> bono
+const BONO_A_NIVEL = {0:0, 1:1, 2:2, 4:3, 7:4, 9:5};                                          // bono -> nivel equivalente
+const ETAPAS = {
+  "Infante":{pas:8, umbral:1}, "Adolescente":{pas:12, umbral:2}, "Joven":{pas:17, umbral:3},
+  "Adulto":{pas:17, umbral:3}, "Mago Experimentado":{pas:12, umbral:2}, "Veterano":{pas:8, umbral:1}
+};
+const SKILLS = ["Pelea","Esquiva","Duelo","Iniciativa","Pociones","Rituales","Herbología","Artesanía"];
+const ARC_POC = [
+  {n:"— Ninguno —"},
+  {n:"Poción herbicida", h:"Herbología", e:"Nivel", d:"Otorga Puntos de Pociones = tu NIVEL en Herbología (1 Novato/2 Competente/3 Experto/4 Maestro). Fuente: Pociones — básicas — Poción herbicida."},
+  {n:"Planta Vitae (ritual)", h:"Rituales", e:"Nivel", d:"Otorga Puntos de Pociones = tu NIVEL en Rituales (1/2/3/4). Fuente: Rituales — intermedios — Planta Vitae."}
+];
+const ARC_RIT = [
+  {n:"— Ninguno —"},
+  {n:"Solución del ritualista (poción)", h:"Pociones", e:"Bono", d:"Otorga Puntos de Rituales = tu BONO de Pociones (1 Novato/2 Competente/4 Experto/7 Maestro/9 Legendario). Fuente: Pociones — intermedias — Solución del ritualista."},
+  {n:"Altar del ritualista", h:"Artesanía", e:"Nivel", d:"Otorga Puntos de Rituales = tu NIVEL en la Artesanía usada para construirlo (Albañilería/Alfarería/Carpintería/Forja/Ingeniería: 1 Novato/2 Competente/3 Experto/4 Maestro). Fuente: Objetos — avanzados — Altar del ritualista."}
+];
+
+// ===== Defaults (igual que el Excel) =====
+const DEFAULTS = {
+  vigor:0, destreza:0, percepcion:0, voluntad:0, poder:1, etapa:"Joven",
+  skills:Object.fromEntries(SKILLS.map(s=>[s,"Desentrenado"])),
+  poc:["Poción herbicida","— Ninguno —","— Ninguno —"], rit:["— Ninguno —","— Ninguno —"],
+  maletin:"No", herbivicus:"No", bisuteria:"No", licantropia:"No",
+  raza:"Humano", carstein:"No", warlock:"No", fuerza:"0", actividad:"No"
+};
+
+const $ = id => document.getElementById(id);
+const opts = (arr, sel) => arr.map(v=>`<option${v===sel?" selected":""}>${v}</option>`).join("");
+
+// ===== Construir UI =====
+$("etapa").innerHTML = opts(Object.keys(ETAPAS), DEFAULTS.etapa);
+$("skills").innerHTML = SKILLS.map(s=>{
+  const id = "sk_"+s;
+  return `<div class="field"><label for="${id}">${s}</label><select id="${id}" data-skill="${s}">${opts(Object.keys(NIVELES),"Desentrenado")}</select></div>`;
+}).join("");
+function arcRows(list, n, prefix){
+  return Array.from({length:n},(_,i)=>`<tr>
+    <td><select id="${prefix}${i}">${opts(list.map(a=>a.n), list[0].n)}</select></td>
+    <td class="hab" id="${prefix}${i}_h"></td>
+    <td class="bonus"><div class="ro" id="${prefix}${i}_b">0</div></td></tr>`).join("");
+}
+$("potArc").innerHTML = arcRows(ARC_POC, 3, "poc");
+$("ritArc").innerHTML = arcRows(ARC_RIT, 2, "rit");
+
+const refTable = list => `<tr><th>Nombre</th><th>Habilidad</th><th>Escala</th><th>Fuente / Nota</th></tr>` +
+  list.slice(1).map(a=>`<tr><td><b>${a.n}</b></td><td>${a.h}</td><td>${a.e}</td><td>${a.d}</td></tr>`).join("");
+$("refPot").innerHTML = refTable(ARC_POC);
+$("refRit").innerHTML = refTable(ARC_RIT);
+
+// ===== Cálculo =====
+const num = id => { const v = parseFloat($(id).value); return isNaN(v) ? 0 : v; };
+const fmt = v => (Math.round(v*100)/100).toString().replace(".", ",");
+const bonoNivel = b => BONO_A_NIVEL[b] ?? 0;
+
+function arcBonus(list, name, bonos){
+  const a = list.find(x=>x.n===name);
+  if(!a || !a.h) return {h:"", b:0};
+  const bono = bonos[a.h] ?? 0;
+  return {h:a.h, b: a.e==="Nivel" ? bonoNivel(bono) : bono};
+}
+
+function calc(){
+  const vig=num("vigor"), des=num("destreza"), per=num("percepcion"), vol=num("voluntad"), pod=num("poder");
+  const et = ETAPAS[$("etapa").value];
+  $("pasBase").textContent = et.pas; $("umbralBase").textContent = et.umbral;
+
+  const bonos = {};
+  SKILLS.forEach(s=> bonos[s] = NIVELES[$("sk_"+s).value] ?? 0);
+
+  let potSum = 0, ritSum = 0;
+  for(let i=0;i<3;i++){ const r=arcBonus(ARC_POC,$("poc"+i).value,bonos); $("poc"+i+"_h").textContent=r.h; $("poc"+i+"_b").textContent=r.b; potSum+=r.b; }
+  for(let i=0;i<2;i++){ const r=arcBonus(ARC_RIT,$("rit"+i).value,bonos); $("rit"+i+"_h").textContent=r.h; $("rit"+i+"_b").textContent=r.b; ritSum+=r.b; }
+  $("potSum").textContent = potSum; $("ritSum").textContent = ritSum;
+
+  const lic = $("licantropia").value==="Sí";
+  const L4 = lic ? 4 : 0;
+
+  // Raza, objetos y pociones activas
+  const raza = $("raza").value;
+  const vigE = vig + (parseInt($("fuerza").value,10) || 0);            // Vigor con poción de fuerza
+  const vigUmb = raza==="Semiduende" ? Math.floor(vigE/2) : vigE;        // Vigor para Umbral
+  let vigPA = vigUmb * (raza==="Semigigante" ? 3 : 1);                   // Vigor para PAs
+  if($("carstein").value==="Sí") vigPA = 0;                              // Anillo de los Carstein
+  const gig2 = raza==="Semigigante" ? 2 : 0;
+  const warl = $("warlock").value==="Sí" ? -2 : 0;
+  const act  = $("actividad").value==="Sí" ? 1 : 0;
+
+  const ini = per + bonos["Iniciativa"] + L4 + warl + act;
+  const atF = vigE + bonos["Pelea"] + L4 + gig2;
+  const atM = pod + bonos["Duelo"];
+  const def = 5 + des + bonos["Esquiva"] + L4 + warl + act;
+  const luF = (atF + def - 5 + ini) / 3;
+  const luM = (atM + def - 5 + ini) / 3;
+  const pas = (et.pas + vigPA + vol) * (lic ? 2 : 1);
+  const umb = et.umbral + vigUmb + L4;
+  const her = et.umbral + vol + (lic ? 2 : 0);
+
+  let pot = pod + bonos["Pociones"];
+  if($("maletin").value==="Sí") pot *= 2;
+  pot += potSum;
+  if($("herbivicus").value==="Sí") pot += bonoNivel(bonos["Herbología"]);
+
+  const rit = pod + bonos["Rituales"] * ($("bisuteria").value==="Sí" ? 2 : 1) + ritSum;
+
+  const out = {rIni:ini,rAtF:atF,rAtM:atM,rDef:def,rLuF:luF,rLuM:luM,rPAs:pas,rUmb:umb,rHer:her,rPot:pot,rRit:rit};
+  for(const k in out) $(k).textContent = fmt(out[k]);
+}
+
+// ===== Estado (se guarda en el navegador) =====
+const KEY = "calc-stats-combate-v1";
+function collect(){
+  const st = {};
+  document.querySelectorAll("input, select").forEach(el=> st[el.id]=el.value);
+  return st;
+}
+function apply(st){ for(const id in st){ const el=$(id); if(el) el.value=st[id]; } }
+function setDefaults(){
+  ["vigor","destreza","percepcion","voluntad","poder","etapa","maletin","herbivicus","bisuteria","licantropia","raza","carstein","warlock","fuerza","actividad"].forEach(k=>$(k).value=DEFAULTS[k]);
+  SKILLS.forEach(s=>$("sk_"+s).value=DEFAULTS.skills[s]);
+  DEFAULTS.poc.forEach((v,i)=>$("poc"+i).value=v);
+  DEFAULTS.rit.forEach((v,i)=>$("rit"+i).value=v);
+}
+setDefaults();
+try{ const s=localStorage.getItem(KEY); if(s) apply(JSON.parse(s)); }catch(e){}
+
+document.addEventListener("input", ()=>{ calc(); try{localStorage.setItem(KEY, JSON.stringify(collect()));}catch(e){} });
+document.addEventListener("change", ()=>{ calc(); try{localStorage.setItem(KEY, JSON.stringify(collect()));}catch(e){} });
+$("reset").addEventListener("click", ()=>{ setDefaults(); try{localStorage.removeItem(KEY);}catch(e){} calc(); });
+calc();
+</script>
+</body>
+</html>
